@@ -10,13 +10,13 @@ import (
 
 const (
 	redisLocal    = "RichieRedis"
-	postgresLocal = "RichiePostgres"
+	postgresLocal = "DigitalWisdomPostgres"
 )
 
 type DigitalWisdomOut struct {
 	dig.Out
-	RedisLocal    *redis.Client `name:"redis_byside"`
-	PostgresLocal *gorm.DB      `name:"postgres_byside"`
+	RedisLocal    *redis.Client `name:"redis_digitalWisdom"`
+	PostgresLocal *gorm.DB      `name:"postgres_digitalWisdom"`
 }
 
 func NewDigitalWisdom(ctx context.Context, dbms config.DatabaseManageSystem) DigitalWisdomOut {
