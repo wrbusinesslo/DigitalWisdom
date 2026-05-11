@@ -26,7 +26,7 @@ func NewPurchaseCtrl(pack purchaseCtrlPack) PurchaseCtrl {
 
 type purchaseCtrlPack struct {
 	dig.In
-	PostgresDigitalWisdom *gorm.DB `name:"postgres_DigitalWisdom"`
+	PostgresDigitalWisdom *gorm.DB `name:"postgres_digitalWisdom"`
 }
 
 type purchaseCtrl struct {
