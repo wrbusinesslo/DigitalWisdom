@@ -1,8 +1,8 @@
 package acl
 
 import (
-	"Byside/service/dao/daoModels/acl"
-	"Byside/service/internal/tools/compress"
+	"DigitalWisdom/service/dao/daoModels/acl"
+	"DigitalWisdom/service/internal/tools/compress"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -17,7 +17,7 @@ type AclRedisDao interface {
 
 func New(r *redis.Client) AclRedisDao {
 	dao := &aclRedisDao{
-		prefixKey: "byside:acl:",
+		prefixKey: "DigitalWisdom:acl:",
 		client:    r,
 	}
 	return dao

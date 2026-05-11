@@ -1,14 +1,5 @@
 {
   "DatabaseManageSystem": {
-    "MongoDB": {
-      "RichieMongo": {
-        "Host": "localhost",
-        "Port": "27017",
-        "User": "",
-        "Password": "",
-        "Database": "my_test_db"
-      }
-    },
     "Redis": {
       "RichieRedis": {
         "Host": "localhost",
@@ -17,17 +8,16 @@
         "Database": 0
       }
     },
-    "MariaDB": {
-      "RichieMaria": {
+    "Postgres": {
+      "RichiePostgres": {
         "Host": "localhost",
-        "Port": "3306",
+        "Port": "5433",
         "Account": "richie",
-        "Password": "richiepass",
-        "Database": "mydb",
+        "Password": "password",
+        "Database": "digitalWisdom",
         "MaxIdle": 3,
         "MaxOpen": 8
       }
-
     }
   },
 

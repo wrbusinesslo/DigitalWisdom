@@ -1,7 +1,7 @@
 package database
 
 import (
-	"Byside/service/internal/config"
+	"DigitalWisdom/service/internal/config"
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

@@ -1,7 +1,7 @@
-package BysideApi
+package DigitalWisdomApi
 
 import (
-	"Byside/service/internal/config"
+	"DigitalWisdom/service/internal/config"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/dig"
@@ -17,13 +17,13 @@ type servicePack struct {
 
 func NewServer(pack servicePack) *http.Server {
 	return &http.Server{
-		Addr:    pack.ServiceAddress.Byside,
+		Addr:    pack.ServiceAddress.DigitalWisdom,
 		Handler: pack.Handler,
 	}
 }
 
 func NewRouterRoot(pack servicePack) *gin.RouterGroup {
-	return pack.Handler.Group("Byside")
+	return pack.Handler.Group("DigitalWisdom")
 }
 
 func NewGinEngine() *gin.Engine {

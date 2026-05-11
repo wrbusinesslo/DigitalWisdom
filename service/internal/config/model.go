@@ -2,14 +2,14 @@ package config
 
 import "go.uber.org/dig"
 
-type BysideServer struct {
+type DigitalWisdomServer struct {
 	dig.Out
 	DBMS           DatabaseManageSystem `mapstructure:"DatabaseManageSystem"`
 	ServiceAddress ServiceAddress       `mapstructure:"service_address"`
 }
 
 type ServiceAddress struct {
-	Byside string `mapstructure:"Byside"`
+	DigitalWisdom string `mapstructure:"DigitalWisdom"`
 }
 
 type DatabaseManageSystem struct {

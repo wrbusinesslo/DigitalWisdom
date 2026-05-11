@@ -1,9 +1,9 @@
-package BysideApi
+package DigitalWisdomApi
 
 import (
-	"Byside/service/controller/aclCtrl"
-	aclDaoModel "Byside/service/dao/daoModels/acl"
-	boAcl "Byside/service/internal/model/bo/acl"
+	"DigitalWisdom/service/controller/aclCtrl"
+	aclDaoModel "DigitalWisdom/service/dao/daoModels/acl"
+	boAcl "DigitalWisdom/service/internal/model/bo/acl"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/dig"
 	"net/http"

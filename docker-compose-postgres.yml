@@ -1,22 +1,22 @@
 version: "3.9"
 
 services:
-  postgres-byside:
+  postgres-digitalWisdom:
     image: postgres:15-alpine
-    container_name: byside-postgres
+    container_name: digitalWisdom-postgres
     restart: always
     environment:
       POSTGRES_USER: richie
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: byside
+      POSTGRES_DB: digitalWisdom
     ports:
-      - "5433:5432" # 正確：本機 5433 映射到容器 5432
+      - "5434:5432" # 正確：本機 5433 映射到容器 5432
     volumes:
       # 確保這個資料夾在你的 Mac 上已經存在，或 Docker 有權限建立它
-      - /Users/richie.lo/PostgreSQL_byside:/var/lib/postgresql/data
+      - /Users/richie.lo/PostgreSQL_digitalWisdom:/var/lib/postgresql/data
     networks:
-      - byside-network
+      - digitalWisdom-network
 
 networks:
-  byside-network:
+  digitalWisdom-network:
     driver: bridge

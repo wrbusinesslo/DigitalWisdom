@@ -1,28 +1,28 @@
 package service
 
 import (
-	BysideApi "Byside/service/api/Byside"
-	"Byside/service/controller/aclCtrl"
-	"Byside/service/controller/noteCtrl"
-	"Byside/service/internal/config"
-	"Byside/service/internal/database"
+	DigitalWisdomApi "DigitalWisdom/service/api/DigitalWisdom"
+	"DigitalWisdom/service/controller/aclCtrl"
+	"DigitalWisdom/service/controller/purchaseCtrl"
+	"DigitalWisdom/service/internal/config"
+	"DigitalWisdom/service/internal/database"
 	"context"
 	"fmt"
 	"go.uber.org/dig"
 	"net/http"
 )
 
-func Byside() Service {
+func DigitalWisdom() Service {
 	once.Do(func() {
-		srv = &BysideServer{}
+		srv = &DigitalWisdomServer{}
 	})
 
 	return srv
 }
 
-type BysideServer struct{}
+type DigitalWisdomServer struct{}
 
-func (srv *BysideServer) Run() {
+func (srv *DigitalWisdomServer) Run() {
 
 	container := dig.New()
 	srv.provideConfig(container)
@@ -38,67 +38,67 @@ func (srv *BysideServer) Run() {
 
 }
 
-func (srv *BysideServer) provideConfig(container *dig.Container) {
+func (srv *DigitalWisdomServer) provideConfig(container *dig.Container) {
 
-	if err := container.Provide(config.NewByside); err != nil {
+	if err := container.Provide(config.NewDigitalWisdom); err != nil {
 		panic(err)
 	}
 }
 
-func (srv *BysideServer) provideService(container *dig.Container) {
+func (srv *DigitalWisdomServer) provideService(container *dig.Container) {
 	if err := container.Provide(func() context.Context {
 		return context.TODO()
 	}); err != nil {
 		panic(err)
 	}
 
-	if err := container.Provide(database.NewByside); err != nil {
+	if err := container.Provide(database.NewDigitalWisdom); err != nil {
 		panic(err)
 	}
 
-	if err := container.Provide(BysideApi.NewServer); err != nil {
+	if err := container.Provide(DigitalWisdomApi.NewServer); err != nil {
 		panic(err)
 	}
 
-	if err := container.Provide(BysideApi.NewRouterRoot); err != nil {
+	if err := container.Provide(DigitalWisdomApi.NewRouterRoot); err != nil {
 		panic(err)
 	}
 
-	if err := container.Provide(BysideApi.NewGinEngine); err != nil {
+	if err := container.Provide(DigitalWisdomApi.NewGinEngine); err != nil {
 		panic(err)
 	}
 
 }
 
-func (srv *BysideServer) provideController(container *dig.Container) {
+func (srv *DigitalWisdomServer) provideController(container *dig.Container) {
 	if err := container.Provide(aclCtrl.NewAcl); err != nil {
 		panic(err)
 	}
-	if err := container.Provide(noteCtrl.NewNote); err != nil {
+	if err := container.Provide(purchaseCtrl.NewPurchaseCtrl); err != nil {
 		panic(err)
 	}
 }
 
-func (srv *BysideServer) invokeApiRoutes(container *dig.Container) {
-	if err := container.Invoke(BysideApi.NewServer); err != nil {
+func (srv *DigitalWisdomServer) invokeApiRoutes(container *dig.Container) {
+	if err := container.Invoke(DigitalWisdomApi.NewServer); err != nil {
 		panic(err)
 	}
 
-	if err := container.Invoke(BysideApi.NewGinEngine); err != nil {
+	if err := container.Invoke(DigitalWisdomApi.NewGinEngine); err != nil {
 		panic(err)
 	}
-	if err := container.Invoke(BysideApi.NewAcl); err != nil {
+	if err := container.Invoke(DigitalWisdomApi.NewAcl); err != nil {
 		panic(err)
 	}
-	if err := container.Invoke(BysideApi.NewNote); err != nil {
+	if err := container.Invoke(DigitalWisdomApi.NewPurchase); err != nil {
 		panic(err)
 	}
 }
 
-func (srv *BysideServer) provideCore(container *dig.Container) {}
+func (srv *DigitalWisdomServer) provideCore(container *dig.Container) {}
 
-func (srv *BysideServer) run(server *http.Server) {
-	fmt.Printf("Byside starts at %s\n", server.Addr)
+func (srv *DigitalWisdomServer) run(server *http.Server) {
+	fmt.Printf("DigitalWisdom starts at %s\n", server.Addr)
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		panic(err)
 	}

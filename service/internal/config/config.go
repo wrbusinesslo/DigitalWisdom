@@ -9,8 +9,8 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-func NewByside() BysideServer {
-	server := BysideServer{}
+func NewDigitalWisdom() DigitalWisdomServer {
+	server := DigitalWisdomServer{}
 	buildconfig(&server, configPath)
 	return server
 }

@@ -1,7 +1,7 @@
 package database
 
 import (
-	"Byside/service/internal/config"
+	"DigitalWisdom/service/internal/config"
 	"context"
 	"github.com/go-redis/redis/v8"
 	"log"

@@ -1,26 +1,27 @@
 package aclCtrl
 
 import (
-	aclDaoModel "Byside/service/dao/daoModels/acl"
-	aclMongoDao "Byside/service/dao/mongoDao/acl"
-	aclRedisDao "Byside/service/dao/redisDao/acl"
-	boAcl "Byside/service/internal/model/bo/acl"
-	"Byside/service/internal/utils"
+	aclDaoModel "DigitalWisdom/service/dao/daoModels/acl"
+	aclPostgresDao "DigitalWisdom/service/dao/postgres/acl"
+	aclRedisDao "DigitalWisdom/service/dao/redisDao/acl"
+	boAcl "DigitalWisdom/service/internal/model/bo/acl"
+	"DigitalWisdom/service/internal/utils"
 	"context"
 	"github.com/go-redis/redis/v8"
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.uber.org/dig"
+	"gorm.io/gorm"
 	"time"
 )
 
 type aclCtrl struct {
-	pack aclCtrlPack
+	pack   aclCtrlPack
+	aclDao aclPostgresDao.AclDao
 }
 
 type aclCtrlPack struct {
 	dig.In
-	MongoByside *mongo.Database `name:"mongo_byside"`
-	RedisByside *redis.Client   `name:"redis_byside"`
+	PostgresDigitalWisdom *gorm.DB      `name:"postgres_digitalWisdom"`
+	RedisDigitalWisdom    *redis.Client `name:"redis_digitalWisdom"`
 }
 
 type AclCtrl interface {
@@ -31,29 +32,17 @@ type AclCtrl interface {
 
 func NewAcl(pack aclCtrlPack) AclCtrl {
 	return &aclCtrl{
-		pack: pack,
+		pack:   pack,
+		aclDao: aclPostgresDao.NewAclDAO(pack.PostgresDigitalWisdom),
 	}
 }
 
 func (ctrl *aclCtrl) Get(ctx context.Context, args *boAcl.GetArgs) (*boAcl.GetReply, error) {
-	aclDao := aclMongoDao.New(ctrl.pack.MongoByside)
-	reply := &boAcl.GetReply{}
-
-	user, err := aclDao.Get(ctx, args.User)
-	if err != nil {
-		return nil, err
-	}
-
-	if user != nil {
-		reply.User = user
-		return reply, nil
-	}
-
+	// Implement Get method using postgres
 	return nil, nil
 }
 func (ctrl *aclCtrl) GetLogin(ctx context.Context, args *boAcl.GetArgs) (*boAcl.GetLoginReply, error) {
-	aclDao := aclMongoDao.New(ctrl.pack.MongoByside)
-	aclRao := aclRedisDao.New(ctrl.pack.RedisByside)
+	aclRao := aclRedisDao.New(ctrl.pack.RedisDigitalWisdom)
 
 	session, err := aclRao.Get(ctx, args.User.Username, args.User.Token)
 	if err != nil {
@@ -63,37 +52,23 @@ func (ctrl *aclCtrl) GetLogin(ctx context.Context, args *boAcl.GetArgs) (*boAcl.
 		return &boAcl.GetLoginReply{Session: session}, nil
 	}
 
-	user, err := aclDao.Get(ctx, args.User)
-	if err != nil {
+	// Implement GetLogin method using postgres
+
+	token := utils.GenerateToken()
+
+	newSession := &aclDaoModel.UserSession{
+		Username: args.User.Username,
+		Token:    token,
+	}
+
+	if err := aclRao.Set(ctx, newSession, time.Minute*30); err != nil {
 		return nil, err
 	}
 
-	if user != nil {
-		token := utils.GenerateToken()
-
-		session := &aclDaoModel.UserSession{
-			Username: user.Username,
-			Token:    token,
-		}
-
-		if err := aclRao.Set(ctx, session, time.Minute*30); err != nil {
-			return nil, err
-		}
-
-		return &boAcl.GetLoginReply{Session: session}, nil
-	}
-
-	return nil, nil
+	return &boAcl.GetLoginReply{Session: newSession}, nil
 }
 
 func (ctrl *aclCtrl) Update(ctx context.Context, args *boAcl.UpdateArgs) error {
-
-	aclDao := aclMongoDao.New(ctrl.pack.MongoByside)
-
-	err := aclDao.Update(ctx, aclDaoModel.Query{args.Query.BulkUserArgs, args.Query.CreatedAt})
-	if err != nil {
-		return err
-	}
-
+	// Implement Update method using postgres
 	return nil
 }
