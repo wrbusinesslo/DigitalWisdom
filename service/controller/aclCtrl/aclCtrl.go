@@ -3,12 +3,13 @@ package aclCtrl
 import (
 	aclDaoModel "DigitalWisdom/service/dao/daoModels/acl"
 	aclPostgresDao "DigitalWisdom/service/dao/postgres/acl"
-	aclRedisDao "DigitalWisdom/service/dao/redisDao/acl"
 	boAcl "DigitalWisdom/service/internal/model/bo/acl"
-	"DigitalWisdom/service/internal/utils"
 	"context"
+	"encoding/hex"
 	"github.com/go-redis/redis/v8"
+	"github.com/google/uuid"
 	"go.uber.org/dig"
+	"golang.org/x/crypto/scrypt"
 	"gorm.io/gorm"
 	"time"
 )
@@ -25,9 +26,8 @@ type aclCtrlPack struct {
 }
 
 type AclCtrl interface {
-	Get(ctx context.Context, args *boAcl.GetArgs) (*boAcl.GetReply, error)
-	GetLogin(ctx context.Context, args *boAcl.GetArgs) (*boAcl.GetLoginReply, error)
-	Update(ctx context.Context, args *boAcl.UpdateArgs) error
+	Acl(ctx context.Context, args *boAcl.AclArgs) bool
+	CreateAccount(ctx context.Context, args *boAcl.CreateAccountArgs) error
 }
 
 func NewAcl(pack aclCtrlPack) AclCtrl {
@@ -37,38 +37,55 @@ func NewAcl(pack aclCtrlPack) AclCtrl {
 	}
 }
 
-func (ctrl *aclCtrl) Get(ctx context.Context, args *boAcl.GetArgs) (*boAcl.GetReply, error) {
-	// Implement Get method using postgres
-	return nil, nil
-}
-func (ctrl *aclCtrl) GetLogin(ctx context.Context, args *boAcl.GetArgs) (*boAcl.GetLoginReply, error) {
-	aclRao := aclRedisDao.New(ctrl.pack.RedisDigitalWisdom)
+func (ctrl *aclCtrl) Acl(ctx context.Context, args *boAcl.AclArgs) bool {
 
-	session, err := aclRao.Get(ctx, args.User.Username, args.User.Token)
+	storedHexHash, err := ctrl.aclDao.GetAccountPassword(ctx, args.Query.AccountID)
 	if err != nil {
-		return nil, err
-	}
-	if session != nil {
-		return &boAcl.GetLoginReply{Session: session}, nil
+		return false
 	}
 
-	// Implement GetLogin method using postgres
-
-	token := utils.GenerateToken()
-
-	newSession := &aclDaoModel.UserSession{
-		Username: args.User.Username,
-		Token:    token,
+	currentHashedBytes, err := scrypt.Key(
+		[]byte(args.Query.Password),
+		[]byte(args.Query.AccountID),
+		16384, 8, 1, 32,
+	)
+	if err != nil {
+		return false
 	}
 
-	if err := aclRao.Set(ctx, newSession, time.Minute*30); err != nil {
-		return nil, err
+	currentHexHash := hex.EncodeToString(currentHashedBytes)
+
+	if currentHexHash != storedHexHash {
+		return false
 	}
 
-	return &boAcl.GetLoginReply{Session: newSession}, nil
+	return true
 }
 
-func (ctrl *aclCtrl) Update(ctx context.Context, args *boAcl.UpdateArgs) error {
-	// Implement Update method using postgres
+func (ctrl *aclCtrl) CreateAccount(ctx context.Context, args *boAcl.CreateAccountArgs) error {
+	accountID := uuid.New().String()
+	hashedPassword, err := scrypt.Key([]byte(args.Query.Password), []byte(accountID), 16384, 8, 1, 32)
+
+	if err != nil {
+		return err
+	}
+
+	account := &aclDaoModel.Account{
+		AccountID: accountID,
+		UserName:  args.Query.UserName,
+		Email:     args.Query.Email,
+		CreatedAt: time.Now(),
+	}
+
+	accountPassword := &aclDaoModel.AccountPassword{
+		AccountID:      accountID,
+		HashedPassword: hex.EncodeToString(hashedPassword),
+		UpdatedAt:      time.Now(),
+	}
+
+	if err := ctrl.aclDao.CreateAccount(ctx, account, accountPassword); err != nil {
+		return err
+	}
+
 	return nil
 }

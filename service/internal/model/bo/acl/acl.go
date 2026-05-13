@@ -1,21 +1,11 @@
-package acl
+package boAcl
 
-import "DigitalWisdom/service/dao/daoModels/acl"
+import aclDaoModel "DigitalWisdom/service/dao/daoModels/acl"
 
-type GetArgs struct {
-	User aclDaoModel.User
-}
-
-type GetReply struct {
-	User *aclDaoModel.User
-}
-
-type GetLoginReply struct {
-	Session *aclDaoModel.UserSession
-}
-
-type UpdateArgs struct {
+type CreateAccountArgs struct {
 	Query *aclDaoModel.Query
 }
 
-type UpdateReply struct{}
+type AclArgs struct {
+	Query *aclDaoModel.AccountPassword
+}
