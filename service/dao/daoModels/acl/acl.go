@@ -4,53 +4,60 @@ import (
 	"time"
 )
 
-type FieldName string
-
-func (f FieldName) String() string {
-	return string(f)
+type Account struct {
+	AccountID      string    `gorm:"primaryKey;column:account_id" json:"account_id"`
+	UserName       string    `gorm:"column:user_name" json:"user_name"`
+	Email          string    `gorm:"column:email" json:"email"`
+	PhoneNumber    string    `gorm:"column:phone_number" json:"phone_number"`
+	ValidateStatus int       `gorm:"column:validate_status" json:"validate_status"`
+	Sex            string    `gorm:"column:sex" json:"sex,omitempty"`
+	BirthDay       time.Time `gorm:"column:birth_day" json:"birth_day,omitempty"`
+	IsActive       bool      `gorm:"column:is_active" json:"is_active"`
+	LastLoginAt    time.Time `gorm:"column:last_login_at" json:"last_login_at,omitempty"`
+	CreatedAt      time.Time `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt      time.Time `gorm:"column:updated_at" json:"updated_at"`
+	DeletedAt      time.Time `gorm:"column:deleted_at;index" json:"-"`
 }
 
-const (
-	Username     FieldName = "username"
-	Password     FieldName = "password"
-	MobileNumber FieldName = "mobile_number"
-	Email        FieldName = "email"
-	Sex          FieldName = "sex"
-	Birthday     FieldName = "birthday"
-	CreatedAt    FieldName = "created_at"
-)
+func (Account) TableName() string {
+	return "acl.account"
+}
 
-type User struct {
-	Username     string    `bson:"username" json:"username"`
-	Password     string    `bson:"password,omitempty" json:"password"`
-	MobileNumber string    `bson:"mobile_number" json:"mobile_number"`
-	Email        string    `bson:"email" json:"email"`
-	Sex          string    `bson:"sex" json:"sex"`
-	Birthday     string    `bson:"birthday" json:"birthday"`
-	CreatedAt    time.Time `bson:"created_at" json:"created_at"`
-	Token        string    `bson:"token" json:"token"`
+type AccountPassword struct {
+	AccountID      string    `gorm:"primaryKey;column:account_id"`
+	HashedPassword string    `gorm:"column:hashed_password"`
+	Password       string    `gorm:"column:password"`
+	UpdatedAt      time.Time `gorm:"column:updated_at"`
+}
+
+func (AccountPassword) TableName() string {
+	return "acl.account_password"
 }
 
 type Query struct {
-	BulkUserArgs []BulkUserArg
-	CreatedAt    time.Time
+	Account
+	Password string
 }
 
-type BulkUserArg struct {
-	Username     string `json:"username"`
-	Password     string `bson:"password,omitempty" json:"password"`
-	MobileNumber string `bson:"mobile_number" json:"mobile_number"`
-	Email        string `bson:"email" json:"email"`
-	Sex          string `bson:"sex" json:"sex"`
-	Birthday     string `bson:"birthday" json:"birthday"`
-}
+type ColumnName string
 
-type UserSession struct {
-	Username string `bson:"username"`
-	Token    string `bson:"token"`
-}
+const (
+	// Account 相關欄位
+	AccountID      ColumnName = "account_id"
+	UserName       ColumnName = "user_name"
+	Email          ColumnName = "email"
+	PhoneNumber    ColumnName = "phone_number"
+	ValidateStatus ColumnName = "validate_status"
+	Sex            ColumnName = "sex"
+	BirthDay       ColumnName = "birth_day"
+	IsActive       ColumnName = "is_active"
+	LastLoginAt    ColumnName = "last_login_at"
 
-type UserWithMeta struct {
-	BulkUserArg `bson:",inline"`
-	CreatedAt   time.Time `bson:"created_at"`
-}
+	// AccountPassword 相關欄位
+	HashedPassword ColumnName = "hashed_password"
+
+	// 共有/通用時間欄位
+	CreatedAt ColumnName = "created_at"
+	UpdatedAt ColumnName = "updated_at"
+	DeletedAt ColumnName = "deleted_at"
+)
